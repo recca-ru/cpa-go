@@ -1,0 +1,217 @@
+{
+  "contract_version": "2026-09-24",
+  "generated_by": "apps/backend/src/scripts/cpa-api-vectors.ts",
+  "note": "Golden-векторы подписи постбэка CPA. Собраны ЖИВЫМИ функциями Recca (включая отрицательные: они выведены порчей настоящей подписи, а не сочинены); клиент обязан получать те же строки байт в байт. ⚠ Случаи с must_verify=false ОБЯЗАНЫ быть отвергнуты: набор из одних положительных векторов зелен на Verify, который возвращает true всегда, а за этой функцией стоит денежная дверь. Секреты и идентификаторы синтетические и не существуют ни в одной базе.",
+  "secrets": {
+    "current": "cpaps_00000000000000000000000000000751",
+    "previous": "cpaps_00000000000000000000000000000750"
+  },
+  "cases": [
+    {
+      "name": "legacy_five_segments",
+      "what": "Базовая форма: цели и метки времени нет — канон из пяти сегментов. Живые интеграции, не знающие о целях, подписывают именно её.",
+      "key_id": "current",
+      "fields": {
+        "click_id": "clk_01K5WV0751CPATESTCLICK0001",
+        "external_id": "order-0751",
+        "status": "confirmed",
+        "sum_rub": 1500,
+        "sub_id": "tg-channel"
+      },
+      "canonical": "clk_01K5WV0751CPATESTCLICK0001:order-0751:confirmed:1500:tg-channel",
+      "segments": 5,
+      "signature": "d8a6f33d5da07522ff18c495ff11c3f5c07601ccddf3357e2515e3e9ba4eb28c",
+      "must_verify": true,
+      "rejection": null
+    },
+    {
+      "name": "sum_absent",
+      "what": "Ни суммы, ни сквозного параметра НЕ передавали: оба сегмента пусты, разделители сохраняются, строка не укорачивается.",
+      "key_id": "current",
+      "fields": {
+        "click_id": "clk_01K5WV0751CPATESTCLICK0001",
+        "external_id": "order-0751",
+        "status": "confirmed"
+      },
+      "canonical": "clk_01K5WV0751CPATESTCLICK0001:order-0751:confirmed::",
+      "segments": 5,
+      "signature": "b00ad7235e9d84cf932418b49d8eac03d61fa2b2b6e7300e8df09fe2a0f37d00",
+      "must_verify": true,
+      "rejection": null
+    },
+    {
+      "name": "sum_zero",
+      "what": "Сумма передана и равна нулю: сегмент несёт «0». Отличается от предыдущего случая — «не передали» и «ноль» это разные факты.",
+      "key_id": "current",
+      "fields": {
+        "click_id": "clk_01K5WV0751CPATESTCLICK0001",
+        "external_id": "order-0751",
+        "status": "confirmed",
+        "sum_rub": 0,
+        "sub_id": "tg-channel"
+      },
+      "canonical": "clk_01K5WV0751CPATESTCLICK0001:order-0751:confirmed:0:tg-channel",
+      "segments": 5,
+      "signature": "3331b3c5b7099e0b679c16fee014e17b4ba54c0eb5807c267c2a4f7d0d601a85",
+      "must_verify": true,
+      "rejection": null
+    },
+    {
+      "name": "sum_fractional",
+      "what": "Дробная сумма подписывается ЛЕКСИЧЕСКОЙ формой числа: 12.5, а не 12.50. Клиент обязан эмитить ровно ту строку, которую подписывает сервер, — форматирование денег до двух знаков здесь ломает подпись.",
+      "key_id": "current",
+      "fields": {
+        "click_id": "clk_01K5WV0751CPATESTCLICK0001",
+        "external_id": "order-0751",
+        "status": "confirmed",
+        "sum_rub": 12.5,
+        "sub_id": "tg-channel"
+      },
+      "canonical": "clk_01K5WV0751CPATESTCLICK0001:order-0751:confirmed:12.5:tg-channel",
+      "segments": 5,
+      "signature": "ff5714ea600e60f2ecf420505724781607c9ca3409e89c94b1ac24bd95bd8ca8",
+      "must_verify": true,
+      "rejection": null
+    },
+    {
+      "name": "goal_empty_six_segments",
+      "what": "Цель ПЕРЕДАНА пустой строкой: канон удлиняется до шести сегментов. Решает присутствие ключа, а не его значение.",
+      "key_id": "current",
+      "fields": {
+        "click_id": "clk_01K5WV0751CPATESTCLICK0001",
+        "external_id": "order-0751",
+        "status": "confirmed",
+        "sum_rub": 1500,
+        "sub_id": "tg-channel",
+        "goal": ""
+      },
+      "canonical": "clk_01K5WV0751CPATESTCLICK0001:order-0751:confirmed:1500:tg-channel:",
+      "segments": 6,
+      "signature": "f7aec4ed1682aebb5998468736dec66bfcd2fa0c1ab6625108a5d703c35d53b9",
+      "must_verify": true,
+      "rejection": null
+    },
+    {
+      "name": "goal_named_six_segments",
+      "what": "Цель передана значением: те же шесть сегментов, шестой несёт код цели.",
+      "key_id": "current",
+      "fields": {
+        "click_id": "clk_01K5WV0751CPATESTCLICK0001",
+        "external_id": "order-0751",
+        "status": "confirmed",
+        "sum_rub": 1500,
+        "sub_id": "tg-channel",
+        "goal": "2"
+      },
+      "canonical": "clk_01K5WV0751CPATESTCLICK0001:order-0751:confirmed:1500:tg-channel:2",
+      "segments": 6,
+      "signature": "c17184c76d351f26b0721e8641a554d2e3ba6bdf360184d71c9f932430c63165",
+      "must_verify": true,
+      "rejection": null
+    },
+    {
+      "name": "timestamp_forces_seven_goal_absent",
+      "what": "Метка времени ФОРСИРУЕТ семь сегментов даже без цели: шестой сегмент пуст, седьмой — метка. Так число сегментов однозначно называет форму, и шесть не могут означать одновременно цель и метку.",
+      "key_id": "current",
+      "fields": {
+        "click_id": "clk_01K5WV0751CPATESTCLICK0001",
+        "external_id": "order-0751",
+        "status": "confirmed",
+        "sum_rub": 1500,
+        "sub_id": "tg-channel",
+        "timestamp": "1789948800"
+      },
+      "canonical": "clk_01K5WV0751CPATESTCLICK0001:order-0751:confirmed:1500:tg-channel::1789948800",
+      "segments": 7,
+      "signature": "b615129a3595d3fa0608a75e7f60629006bb0361b24428f133bc09c26a3c49ce",
+      "must_verify": true,
+      "rejection": null
+    },
+    {
+      "name": "timestamp_and_goal_seven",
+      "what": "Метка и цель вместе: семь сегментов, цель шестая, метка седьмая.",
+      "key_id": "current",
+      "fields": {
+        "click_id": "clk_01K5WV0751CPATESTCLICK0001",
+        "external_id": "order-0751",
+        "status": "confirmed",
+        "sum_rub": 1500,
+        "sub_id": "tg-channel",
+        "goal": "2",
+        "timestamp": "1789948800"
+      },
+      "canonical": "clk_01K5WV0751CPATESTCLICK0001:order-0751:confirmed:1500:tg-channel:2:1789948800",
+      "segments": 7,
+      "signature": "a853f693034a7dbb865935bdfca35258b2ec500d9cf8c1b16b90a7cae7260868",
+      "must_verify": true,
+      "rejection": null
+    },
+    {
+      "name": "previous_slot_rotation",
+      "what": "Те же поля, подписанные ПРЕЖНИМ секретом. После ротации он принимается ещё семь суток, поэтому клиент может менять секрет не в ту же секунду. Заголовок X-CPA-Key-Id при этом необязателен.",
+      "key_id": "previous",
+      "fields": {
+        "click_id": "clk_01K5WV0751CPATESTCLICK0001",
+        "external_id": "order-0751",
+        "status": "confirmed",
+        "sum_rub": 1500,
+        "sub_id": "tg-channel"
+      },
+      "canonical": "clk_01K5WV0751CPATESTCLICK0001:order-0751:confirmed:1500:tg-channel",
+      "segments": 5,
+      "signature": "1689530eddd51eac3549de1f49f68f4edb49c28acbbf87164b6598d814e82e0d",
+      "must_verify": true,
+      "rejection": null
+    },
+    {
+      "name": "tampered_signature",
+      "what": "Подпись имеет верную форму — 64 шестнадцатеричных знака, — но получена порчей настоящей: изменён последний знак. Клиент обязан ОТВЕРГНУТЬ её. Это самый частый вид подделки: длину и алфавит проверить легко, и реализация, остановившаяся на них, выглядит работающей.",
+      "key_id": "current",
+      "fields": {
+        "click_id": "clk_01K5WV0751CPATESTCLICK0001",
+        "external_id": "order-0751",
+        "status": "confirmed",
+        "sum_rub": 1500,
+        "sub_id": "tg-channel"
+      },
+      "canonical": "clk_01K5WV0751CPATESTCLICK0001:order-0751:confirmed:1500:tg-channel",
+      "segments": 5,
+      "signature": "d8a6f33d5da07522ff18c495ff11c3f5c07601ccddf3357e2515e3e9ba4eb280",
+      "must_verify": false,
+      "rejection": "signature_mismatch"
+    },
+    {
+      "name": "signature_not_64_hex",
+      "what": "Подпись не является 64 шестнадцатеричными знаками (укорочена на один). Отвергается ДО сравнения — и код отказа другой, чем у несовпадения: первое чинится формой запроса, второе секретом.",
+      "key_id": "current",
+      "fields": {
+        "click_id": "clk_01K5WV0751CPATESTCLICK0001",
+        "external_id": "order-0751",
+        "status": "confirmed",
+        "sum_rub": 1500,
+        "sub_id": "tg-channel"
+      },
+      "canonical": "clk_01K5WV0751CPATESTCLICK0001:order-0751:confirmed:1500:tg-channel",
+      "segments": 5,
+      "signature": "d8a6f33d5da07522ff18c495ff11c3f5c07601ccddf3357e2515e3e9ba4eb28",
+      "must_verify": false,
+      "rejection": "malformed_signature"
+    }
+  ],
+  "secure_tokens": [
+    {
+      "name": "current_slot",
+      "what": "Токен GET-двери для действующего секрета. ⚠ В строке запроса ездит именно он, а НЕ сам секрет подписи: строка запроса целиком попадает в журналы промежуточных серверов.",
+      "key_id": "current",
+      "offer_id": "offer_01K5WV0751CPATESTKEY000123",
+      "token": "cpag_654d8e2fff596e594d03e18f9a8cbbbf34844abc5436200d56c1ff060d143e75"
+    },
+    {
+      "name": "previous_slot",
+      "what": "Тот же оффер, прежний секрет: ротация отзывает производный токен автоматически, отдельной процедуры отзыва у него нет.",
+      "key_id": "previous",
+      "offer_id": "offer_01K5WV0751CPATESTKEY000123",
+      "token": "cpag_f9602ce1af65706e0d3aec97c03f4ea79a3ee61b9224af3787f3cf54c0279589"
+    }
+  ]
+}

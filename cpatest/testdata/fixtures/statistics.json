@@ -1,0 +1,18 @@
+[
+  {
+    "key": "off_1",
+    "clicks": 120,
+    "conversions": 8,
+    "approved": 6,
+    "payout_rub": 4000,
+    "revenue_rub": 6400
+  },
+  {
+    "key": "off_2",
+    "clicks": 40,
+    "conversions": 1,
+    "approved": 0,
+    "payout_rub": 0,
+    "revenue_rub": 0
+  }
+]

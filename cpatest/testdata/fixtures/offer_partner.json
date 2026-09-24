@@ -1,0 +1,49 @@
+{
+  "id": "off_1",
+  "name": "Подписка на курс",
+  "advertiser_id": "adv_1",
+  "payout_model": "cpa",
+  "payout_rate": {
+    "kind": "fixed",
+    "value_rub": 500,
+    "value_percent": null
+  },
+  "goals": [
+    {
+      "code": "1",
+      "name": "Оплата",
+      "is_milestone": false,
+      "payout_rate": {
+        "kind": "fixed",
+        "value_rub": 500,
+        "value_percent": null
+      },
+      "hold_days": 30
+    },
+    {
+      "code": "webinar",
+      "name": "Дошёл до вебинара",
+      "is_milestone": true,
+      "payout_rate": null,
+      "hold_days": null
+    }
+  ],
+  "geo": {
+    "mode": "allow",
+    "countries": [
+      "RU",
+      "BY"
+    ]
+  },
+  "allowed_traffic": [
+    "social",
+    "seo",
+    "email"
+  ],
+  "disallowed_traffic": [
+    "brand",
+    "incent"
+  ],
+  "hold_days": 30,
+  "attribution_window_days": 30
+}

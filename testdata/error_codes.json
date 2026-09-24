@@ -1,0 +1,103 @@
+{
+  "contract_version": "2026-09-24",
+  "generated_from": "docs/federation/cpa-api.md — раздел 12, блок BEGIN GENERATED: error-table",
+  "note": "Коды машинной двери /federation/v1/cpa/*. Собираются в Recca из CPA_FEDERATION_ERROR_DOCS; здесь — копия, которую переносит scripts/sdk-go/sync-contract.mjs. Кода MALFORMED_RESPONSE тут нет и быть не может: его ставит сам клиент, когда дверь ответила 2xx с success:false.",
+  "codes": [
+    {
+      "code": "MISSING_TENANT_SCOPE",
+      "http": 401
+    },
+    {
+      "code": "INSUFFICIENT_SCOPE",
+      "http": 403
+    },
+    {
+      "code": "FEATURE_NOT_AVAILABLE",
+      "http": 403
+    },
+    {
+      "code": "PRODUCT_PAUSED",
+      "http": 403
+    },
+    {
+      "code": "RATE_LIMIT_EXCEEDED",
+      "http": 429
+    },
+    {
+      "code": "INTERNAL_ERROR",
+      "http": 500
+    },
+    {
+      "code": "INVALID_INPUT",
+      "http": 400
+    },
+    {
+      "code": "PII_NOT_ACCEPTED",
+      "http": 400
+    },
+    {
+      "code": "RESERVED_EXTERNAL_ID",
+      "http": 400
+    },
+    {
+      "code": "PARTNER_NOT_FOUND",
+      "http": 404
+    },
+    {
+      "code": "PARTNER_NOT_ACTIVE",
+      "http": 409
+    },
+    {
+      "code": "ADVERTISER_NOT_FOUND",
+      "http": 404
+    },
+    {
+      "code": "OFFER_NOT_FOUND",
+      "http": 404
+    },
+    {
+      "code": "CONVERSION_NOT_FOUND",
+      "http": 404
+    },
+    {
+      "code": "PAYOUT_NOT_FOUND",
+      "http": 404
+    },
+    {
+      "code": "UNKNOWN_GOAL",
+      "http": 400
+    },
+    {
+      "code": "WINDOW_EXPIRED",
+      "http": 409
+    },
+    {
+      "code": "ALREADY_CONVERTED",
+      "http": 409
+    },
+    {
+      "code": "EXTERNAL_ID_CONFLICT",
+      "http": 409
+    },
+    {
+      "code": "ILLEGAL_TRANSITION",
+      "http": 409
+    },
+    {
+      "code": "IDEMPOTENT_MISMATCH",
+      "http": 409
+    },
+    {
+      "code": "BELOW_MIN_PAYOUT",
+      "http": 400
+    },
+    {
+      "code": "INSUFFICIENT_BALANCE",
+      "http": 409
+    },
+    {
+      "code": "REVERSAL_FAILED",
+      "http": 500
+    }
+  ]
+}

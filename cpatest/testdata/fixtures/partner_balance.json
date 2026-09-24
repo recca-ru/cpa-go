@@ -1,0 +1,7 @@
+{
+  "available_rub": 1500,
+  "on_hold_rub": 700,
+  "paid_total_rub": 3200,
+  "min_payout_rub": 1000,
+  "can_request": true
+}

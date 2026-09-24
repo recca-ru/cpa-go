@@ -1,0 +1,10 @@
+{
+  "url": "https://hook.example/cpa",
+  "events": [
+    "cpa.conversion.approved",
+    "cpa.conversion.declined",
+    "cpa.conversion.reversed",
+    "cpa.payout.paid"
+  ],
+  "secret": "whsec_shown_once"
+}

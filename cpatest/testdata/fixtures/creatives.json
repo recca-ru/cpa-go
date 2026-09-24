@@ -1,0 +1,41 @@
+[
+  {
+    "id": "lnd_1",
+    "kind": "landing",
+    "title": "Главная посадочная",
+    "description": null,
+    "url": "https://adv.example/course",
+    "text": null,
+    "mime_type": null,
+    "width": null,
+    "height": null,
+    "is_default": true,
+    "created_at": "2026-09-01T10:00:00.000Z"
+  },
+  {
+    "id": "cr_1",
+    "kind": "banner",
+    "title": "Баннер 300×250",
+    "description": "Для соцсетей",
+    "url": "https://cdn.example/b1.png",
+    "text": null,
+    "mime_type": "image/png",
+    "width": 300,
+    "height": 250,
+    "is_default": false,
+    "created_at": "2026-09-01T10:00:00.000Z"
+  },
+  {
+    "id": "cr_2",
+    "kind": "text",
+    "title": "Текст для поста",
+    "description": null,
+    "url": null,
+    "text": "Курс, который окупается за месяц.",
+    "mime_type": null,
+    "width": null,
+    "height": null,
+    "is_default": false,
+    "created_at": "2026-09-01T10:00:00.000Z"
+  }
+]

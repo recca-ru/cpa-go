@@ -1,0 +1,28 @@
+{
+  "contract_version": "2026-09-24",
+  "environment": "sandbox",
+  "network_id": "net_sandbox",
+  "scopes": [
+    "cpa:self:read",
+    "cpa:self:write",
+    "cpa:partners:read",
+    "cpa:partners:write",
+    "cpa:offers:read",
+    "cpa:links:write",
+    "cpa:clicks:write",
+    "cpa:conversions:read",
+    "cpa:conversions:write",
+    "cpa:conversions:reverse",
+    "cpa:payouts:read",
+    "cpa:payouts:write",
+    "cpa:stats:read"
+  ],
+  "agent_base": "margin",
+  "agent_hold": {
+    "mode": "follow_conversion",
+    "days": null
+  },
+  "min_payout_rub": 1000,
+  "rate_limit_per_min": 3000,
+  "webhook_configured": false
+}

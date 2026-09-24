@@ -1,0 +1,33 @@
+{
+  "id": "off_1",
+  "name": "Подписка на курс",
+  "advertiser_id": "adv_1",
+  "payout_model": "cpa",
+  "revenue_rate": {
+    "kind": "fixed",
+    "value_rub": 800,
+    "value_percent": null
+  },
+  "goals": [
+    {
+      "code": "1",
+      "name": "Оплата",
+      "is_milestone": false,
+      "revenue_rate": {
+        "kind": "fixed",
+        "value_rub": 800,
+        "value_percent": null
+      },
+      "hold_days": 30
+    }
+  ],
+  "geo": {
+    "mode": "allow",
+    "countries": [
+      "RU",
+      "BY"
+    ]
+  },
+  "hold_days": 30,
+  "attribution_window_days": 30
+}

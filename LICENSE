@@ -1,0 +1,20 @@
+Copyright (c) 2026 Recca. Все права защищены. All rights reserved.
+
+Этот программный код (Go-клиент CPA-API Recca, модуль go.recca.ru/cpa) —
+собственность правообладателя. Использование, копирование и изменение
+разрешены только клиентам Recca и только для интеграции с API Recca в
+соответствии с договором, заключённым с правообладателем. Распространение
+третьим лицам, в том числе в изменённом виде, без письменного согласия
+правообладателя запрещено.
+
+Код предоставляется «как есть», без каких-либо гарантий, явных или
+подразумеваемых, в пределах, допускаемых применимым правом.
+
+This software (the Recca CPA API Go client, module go.recca.ru/cpa) is
+proprietary. Use, copying and modification are permitted only to Recca
+customers and only for integrating with the Recca API under an agreement
+with the copyright holder. Redistribution to third parties, modified or not,
+is prohibited without the copyright holder's written consent.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
