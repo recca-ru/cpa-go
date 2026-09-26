@@ -237,7 +237,7 @@ var catalog = []Mutation{
 	{
 		Name:    "набор молча пропускает выплаты вместо объявления",
 		File:    "cpatest/conformance.go",
-		Old:     "t.Logf(\"сценарий 4 (баланс и выплата) пропущен по SkipPayouts\")",
+		Old:     "t.Logf(\"цепочка 4 (баланс и выплата) пропущен по SkipPayouts\")",
 		New:     "_ = t",
 		Pattern: "TestConformanceIsGreenOnStandAndRedOnBrokenTriple",
 		Pkg:     "./...",
@@ -333,7 +333,7 @@ var catalog = []Mutation{
 		Pkg:     "./...",
 		WantRed: true,
 	},
-	// ── сценарий 4 Conformance: согласованность баланса и заявок (24.09) ─────
+	// ── цепочка 4 Conformance: согласованность баланса и заявок (24.09) ─────
 	{
 		Name:    "набор снова идёт в заявку вслепую, не читая can_request",
 		File:    "cpatest/conformance.go",
@@ -415,6 +415,61 @@ var catalog = []Mutation{
 		Pattern: "TestMethodsDoNotOpenOwnTransport|TestTransportOwnerActuallyHolds",
 		Pkg:     ".",
 		WantRed: false,
+	},
+	// ── сценарии договора (WV-0761, 26.09) ───────────────────────────────────
+	{
+		Name:    "выплата сценария не сверяется со ставкой",
+		File:    "cpatest/scenarios.go",
+		Old:     "\tif card.PayoutRUB != wantPay {",
+		New:     "\tif false {",
+		Pattern: "TestCheckAmountsRevshare",
+		Pkg:     "./cpatest",
+		WantRed: true,
+	},
+	{
+		Name:    "сумма ноги рекрутёра не сверяется с процентом",
+		File:    "cpatest/scenarios.go",
+		Old:     "\tif leg.AmountRUB != want {",
+		New:     "\tif false {",
+		Pattern: "TestCheckAgentLeg",
+		Pkg:     "./cpatest",
+		WantRed: true,
+	},
+	{
+		Name:    "нецелая доля молча округляется вместо отказа",
+		File:    "cpatest/scenarios.go",
+		Old:     "\tif !v.IsInt() {",
+		New:     "\tif false {",
+		Pattern: "TestPercentOfIsExactOrRefuses",
+		Pkg:     "./cpatest",
+		WantRed: true,
+	},
+	{
+		Name:    "холд не проверяется на соответствие цели",
+		File:    "cpatest/scenarios.go",
+		Old:     "\tif d := card.HoldUntil.Sub(want); d > time.Minute || d < -time.Minute {",
+		New:     "\tif d := card.HoldUntil.Sub(want); false && d > 0 {",
+		Pattern: "TestCheckHold",
+		Pkg:     "./cpatest",
+		WantRed: true,
+	},
+	{
+		Name:    "повтор принятой заявки снова читается как ложь баланса",
+		File:    "cpatest/conformance.go",
+		Old:     "\t\tcase err == nil && payoutResp.StatusCode == 200:",
+		New:     "\t\tcase false:",
+		Pattern: "TestConformancePayoutRepeatOfAcceptedIsConsistent",
+		Pkg:     "./cpatest",
+		WantRed: true,
+	},
+	{
+		Name:    "сценарии без офферов выпадают молча",
+		File:    "cpatest/scenarios.go",
+		Old:     "\t\t\tt.Logf(\"сценарий договора %s пропущен: оффер не задан\", sc.name)",
+		New:     "\t\t\t_ = sc.name",
+		Pattern: "TestScenariosWithoutOffersAreNamedSkipped",
+		Pkg:     "./cpatest",
+		WantRed: true,
 	},
 	// ── хвосты WV-0760 после WV-0770/0772 ────────────────────────────────────
 	{

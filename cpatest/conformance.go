@@ -51,6 +51,10 @@ type ConformanceOptions struct {
 	ExternalIDPrefix string
 	// Now — «сейчас» для проверок подписи; пусто — time.Now.
 	Now time.Time
+	// Scenarios — сценарии приёмки по договору (дополнение к Приложению № 1,
+	// раздел 6). nil — не гонять: общие цепочки выше их НЕ заменяют, они
+	// проверяют библиотеку и дверь, а не свойства конкретных офферов.
+	Scenarios *ScenarioOptions
 }
 
 func (o ConformanceOptions) partner() cpa.PartnerExternalID {
@@ -114,7 +118,7 @@ func Conformance(t TB, c *cpa.Client, opts ConformanceOptions) {
 
 	env, err := chainSelf(ctx, t, c)
 	if err != nil {
-		t.Errorf("сценарий 1 (сведения о сети): %v", err)
+		t.Errorf("цепочка 1 (сведения о сети): %v", err)
 	}
 	// Второй ремень поверх адреса: среду называет СЕРВЕР. Адрес песочницы можно
 	// направить не туда (прокси, DNS, петля, проброшенная на живую машину), ответ
@@ -133,22 +137,26 @@ func Conformance(t TB, c *cpa.Client, opts ConformanceOptions) {
 
 	offerID, err := chainCatalogue(ctx, t, c, opts)
 	if err != nil {
-		t.Errorf("сценарий 2 (каталог и материалы): %v", err)
+		t.Errorf("цепочка 2 (каталог и материалы): %v", err)
 	}
 
 	if offerID == "" {
-		t.Errorf("сценарий 3 (вертикаль) пропущен: оффера для прогона не нашлось")
+		t.Errorf("цепочка 3 (вертикаль) пропущен: оффера для прогона не нашлось")
 	} else if err := chainVertical(ctx, t, c, opts, offerID); err != nil {
-		t.Errorf("сценарий 3 (ссылка → клик → конверсия): %v", err)
+		t.Errorf("цепочка 3 (ссылка → клик → конверсия): %v", err)
 	}
 
 	switch {
 	case opts.SkipPayouts:
-		t.Logf("сценарий 4 (баланс и выплата) пропущен по SkipPayouts")
+		t.Logf("цепочка 4 (баланс и выплата) пропущен по SkipPayouts")
 	default:
 		if err := chainPayout(ctx, t, c, opts); err != nil {
-			t.Errorf("сценарий 4 (баланс и выплата): %v", err)
+			t.Errorf("цепочка 4 (баланс и выплата): %v", err)
 		}
+	}
+
+	if opts.Scenarios != nil {
+		runScenarios(ctx, t, c, opts)
 	}
 
 	// Подписи проверяются всегда: сети в них нет, и от площадки они не зависят.
@@ -197,10 +205,10 @@ func checkTarget(c *cpa.Client) error {
 		c.BaseURL(), probe.BaseURL())
 }
 
-// ── сценарий 1: сеть отвечает и называет свои условия ────────────────────────
+// ── цепочка 1: сеть отвечает и называет свои условия ────────────────────────
 
 // chainSelf возвращает среду, названную сервером, даже когда остальные проверки
-// сценария не прошли: решение «можно ли писать» от них не зависит.
+// цепочки не прошли: решение «можно ли писать» от них не зависит.
 func chainSelf(ctx context.Context, t TB, c *cpa.Client) (cpa.DeploymentEnvironment, error) {
 	info, resp, err := c.Self.Get(ctx)
 	if err != nil {
@@ -225,7 +233,7 @@ func chainSelf(ctx context.Context, t TB, c *cpa.Client) (cpa.DeploymentEnvironm
 	return env, nil
 }
 
-// ── сценарий 2: каталог, оффер, материалы ────────────────────────────────────
+// ── цепочка 2: каталог, оффер, материалы ────────────────────────────────────
 
 func chainCatalogue(ctx context.Context, t TB, c *cpa.Client, opts ConformanceOptions) (string, error) {
 	offers, _, err := c.Offers.ListForPartner(ctx, cpa.ListOffersParams{
@@ -281,7 +289,7 @@ func chainCatalogue(ctx context.Context, t TB, c *cpa.Client, opts ConformanceOp
 	return offerID, nil
 }
 
-// ── сценарий 3: партнёр → ссылка → клик → конверсия ──────────────────────────
+// ── цепочка 3: партнёр → ссылка → клик → конверсия ──────────────────────────
 
 func chainVertical(ctx context.Context, t TB, c *cpa.Client, opts ConformanceOptions, offerID string) error {
 	partner := opts.partner()
@@ -377,7 +385,7 @@ func chainVertical(ctx context.Context, t TB, c *cpa.Client, opts ConformanceOpt
 	return nil
 }
 
-// ── сценарий 4: баланс и выплата ─────────────────────────────────────────────
+// ── цепочка 4: баланс и выплата ─────────────────────────────────────────────
 
 func chainPayout(ctx context.Context, t TB, c *cpa.Client, opts ConformanceOptions) error {
 	partner := opts.partner()
@@ -409,9 +417,17 @@ func chainPayout(ctx context.Context, t TB, c *cpa.Client, opts ConformanceOptio
 	//
 	// Идти в заявку вслепую, как делала первая редакция, значило краснеть на
 	// КАЖДОЙ свежей песочнице: у нового партнёра всё в холде, и дверь права.
-	payout, _, err := c.Payouts.Create(ctx, params)
+	payout, payoutResp, err := c.Payouts.Create(ctx, params)
 	if !balance.CanRequest {
 		switch {
+		// ⚠ Ключ заявки — партнёр и ПЕРИОД. Второй прогон за тот же день с той же
+		// суммой получает 200 — ту же заявку, принятую раньше, — и это не ложь
+		// баланса: денег заявка не списала второй раз. Найдено вторым прогоном
+		// 26.09.2026: первая редакция читала повтор как приём новой заявки.
+		case err == nil && payoutResp.StatusCode == 200:
+			t.Logf("заявка за этот период уже принята раньше (%s на %s ₽, повтор 200) — с балансом согласовано; request_id %s",
+				payout.ID, payout.AmountRUB, payoutResp.RequestID)
+			return nil
 		case err == nil:
 			return fmt.Errorf("баланс врёт: can_request = false (доступно %s, порог %s), а дверь приняла заявку %s",
 				balance.AvailableRUB, balance.MinPayoutRUB, payout.ID)
@@ -432,6 +448,10 @@ func chainPayout(ctx context.Context, t TB, c *cpa.Client, opts ConformanceOptio
 	if payout.AmountRUB != amount {
 		return fmt.Errorf("дверь вернула заявку на %s вместо %s", payout.AmountRUB, amount)
 	}
+	// Положительная ветка говорит о себе так же громко, как отрицательная:
+	// «заявку приняли» без номера и request_id в протокол не положить.
+	t.Logf("заявка на выплату принята: %s на %s ₽ — request_id %s",
+		payout.ID, payout.AmountRUB, payoutResp.RequestID)
 
 	// ⚠⚠ Повтор с ДРУГОЙ суммой обязан быть отказом, а не успехом. Успех сообщил
 	// бы о деньгах, которых в кошельке нет — дословно находка F-42 реестра Recca.

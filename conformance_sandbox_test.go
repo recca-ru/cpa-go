@@ -19,6 +19,9 @@ import (
 //
 //	RECCA_CPA_SANDBOX_PARTNER      — под каким партнёром идти
 //	RECCA_CPA_SANDBOX_OFFER        — на каком оффере
+//	RECCA_CPA_SANDBOX_BRAND_OFFER, RECCA_CPA_SANDBOX_BRAND_GOAL — сценарий 1 договора
+//	RECCA_CPA_SANDBOX_GOAL_OFFER, RECCA_CPA_SANDBOX_GOAL         — сценарий 3
+//	RECCA_CPA_SANDBOX_REVSHARE_OFFER                              — сценарии 2 и 4
 //	RECCA_CPA_SANDBOX_SKIP_PAYOUTS — "1", если на площадке нельзя создавать заявки
 //	                                 вовсе (пустой баланс цепочку не роняет)
 //
@@ -35,9 +38,21 @@ func TestConformanceAgainstSandbox(t *testing.T) {
 		t.Fatalf("клиент песочницы не создан: %v", err)
 	}
 
-	cpatest.Conformance(t, client, cpatest.ConformanceOptions{
+	opts := cpatest.ConformanceOptions{
 		PartnerExternalID: cpa.PartnerExternalID(os.Getenv("RECCA_CPA_SANDBOX_PARTNER")),
 		OfferID:           os.Getenv("RECCA_CPA_SANDBOX_OFFER"),
 		SkipPayouts:       os.Getenv("RECCA_CPA_SANDBOX_SKIP_PAYOUTS") == "1",
-	})
+	}
+	// Сценарии приёмки по договору — если заданы их офферы. Без них прогон
+	// остаётся проверкой библиотеки и двери, а не приёмкой.
+	if s := (cpatest.ScenarioOptions{
+		BrandOfferID:    os.Getenv("RECCA_CPA_SANDBOX_BRAND_OFFER"),
+		BrandGoal:       os.Getenv("RECCA_CPA_SANDBOX_BRAND_GOAL"),
+		GoalOfferID:     os.Getenv("RECCA_CPA_SANDBOX_GOAL_OFFER"),
+		Goal:            os.Getenv("RECCA_CPA_SANDBOX_GOAL"),
+		RevshareOfferID: os.Getenv("RECCA_CPA_SANDBOX_REVSHARE_OFFER"),
+	}); s.BrandOfferID != "" || s.GoalOfferID != "" || s.RevshareOfferID != "" {
+		opts.Scenarios = &s
+	}
+	cpatest.Conformance(t, client, opts)
 }

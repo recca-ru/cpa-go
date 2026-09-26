@@ -722,7 +722,7 @@ func TestConformancePayoutChainFollowsCanRequest(t *testing.T) {
 			} else {
 				found := false
 				for _, message := range rec.errors {
-					if strings.Contains(message, "сценарий 4") && strings.Contains(message, tc.wantError) {
+					if strings.Contains(message, "цепочка 4") && strings.Contains(message, tc.wantError) {
 						found = true
 					}
 				}
@@ -817,5 +817,51 @@ func TestServerRecruiterThreeStates(t *testing.T) {
 	}
 	if got := server.Requests()[1].BodyString(); !strings.Contains(got, `"recruiter_external_id":null`) {
 		t.Errorf("в тело открепления не ушёл null: %s", got)
+	}
+}
+
+// Пятый мир (26.09.2026): баланс пуст, потому что заявка за этот период уже
+// принята, и повтор набора за тот же день получает её же с 200. Это не ложь
+// баланса — первая редакция набора читала такой повтор как приём новой заявки
+// и краснела на втором прогоне в сутки.
+func TestConformancePayoutRepeatOfAcceptedIsConsistent(t *testing.T) {
+	now := time.Date(2026, 9, 26, 12, 0, 0, 0, time.UTC)
+	server := NewServer(t)
+	server.canRequest = cpa.Ptr(false)
+	c := server.Client(t)
+
+	balance, _, err := c.Partners.Balance(context.Background(), "conformance-webmaster")
+	if err != nil {
+		t.Fatalf("баланс: %v", err)
+	}
+	amount := balance.MinPayoutRUB
+	if amount <= 0 {
+		amount = 1
+	}
+	params, err := cpa.NewPayoutParams("conformance-webmaster", amount,
+		cpa.DateOf(now.AddDate(0, 0, -30)), cpa.DateOf(now))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, resp, err := c.Payouts.Create(context.Background(), params); err != nil || resp.StatusCode != 201 {
+		t.Fatalf("первая заявка: %v", err)
+	}
+
+	rec := &recorder{}
+	Conformance(rec, c, ConformanceOptions{Now: now})
+
+	for _, message := range rec.errors {
+		if strings.Contains(message, "цепочка 4") {
+			t.Fatalf("повтор принятой заявки прочитан как ложь баланса: %s", message)
+		}
+	}
+	logged := false
+	for _, message := range rec.logs {
+		if strings.Contains(message, "уже принята раньше") {
+			logged = true
+		}
+	}
+	if !logged {
+		t.Errorf("повтор принятой заявки не назван в журнале:\n  %s", strings.Join(rec.logs, "\n  "))
 	}
 }
